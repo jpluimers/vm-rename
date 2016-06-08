@@ -78,6 +78,7 @@ fi
 #
 find . -type f -name "*$OLDNAME*" -exec sh -c " 
  FILE=\$(echo \"\$0\" | sed \"s/\$OLDNAME/\$NEWNAME/g\"); 
+ echo renaming \"\$0\" to \"\$FILE\";
  mv \"\$0\" \"\$FILE\";
 " {} \;
 
