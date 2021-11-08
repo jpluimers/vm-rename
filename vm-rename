@@ -88,9 +88,18 @@ cd ..
 if [ "$DIRNAME" != "$NEWNAME" ]; then
   mv "$DIRNAME" "$NEWNAME"
   if [ $? -ne 0 ]; then
-    echo "ERROR renaming \"$DIRNAME\" to \"$NEWNAME\". Exiting.."
-    echo "The VM is now in an inconsistent state, and you need to fix it manually."
-    exit 1
+    echo "ERROR renaming \"$DIRNAME\" to \"$NEWNAME\". Trying with objtool if DataStore is VSAN..."
+    if [ -f /usr/lib/vmware/osfs/bin/objtool ]; then
+    # Try to rename folder via objtool - mv cannot be used for folders in vSAN
+    /usr/lib/vmware/osfs/bin/objtool setAttr -u $(readlink "$DIRNAME") -n "$NEWNAME"
+    if [ $? -ne 0 ]; then
+      echo "The VM is now in an inconsistent state, and you need to fix it manually."
+      exit 1
+    fi
+    else
+      echo "The VM is now in an inconsistent state, and you need to fix it manually."
+      exit 1
+    fi
   fi
 fi
 
